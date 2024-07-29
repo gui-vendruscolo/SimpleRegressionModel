@@ -23,26 +23,26 @@ y_test = torch.tensor(y_test, dtype=torch.float32).view(-1, 1)
 
 class SimpleRegressor(nn.Module):
 
-    def __init__(self, input_dim):
+    def __init__(self, input_dim, hidden_dim, output_dim):
         super(SimpleRegressor, self).__init__()
-        self.fc1 = nn.Linear(input_dim, 50)
-        self.fc2 = nn.Linear(50, 50)
-        self.fc3 = nn.Linear(50, 1)
-        self.dropout = nn.Dropout(p=0.5)
+        self.fc1 = nn.Linear(input_dim, hidden_dim)
         self.relu = nn.ReLU()
+        self.fc2 = nn.Linear(hidden_dim, output_dim)
 
     def forward(self, x):
-        x = self.relu(self.fc1(x))
-        x = self.dropout(x)
-        x = self.relu(self.fc2(x))
-        x = self.dropout(x)
-        x = self.fc3(x)
-        return x
+        out = self.fc1(x)
+        out = self.relu(out)
+        out = self.fc2(out)
+        return out
+    
+input_dim = X_train.shape[1]
+hidden_dim = 50
+output_dim = 1
 
-model = SimpleRegressor(input_dim = X_train.shape[1])
+model = SimpleRegressor(input_dim, hidden_dim, output_dim)
 
 criterion = nn.MSELoss()
-optimizer = optim.Adam(model.parameters(), lr=0.001)
+optimizer = optim.SGD(model.parameters(), lr=0.01)
 
 
 print("now training")
