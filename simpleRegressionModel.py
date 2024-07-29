@@ -69,6 +69,12 @@ with torch.no_grad():
 y_pred = y_pred.numpy()
 y_test = y_test.numpy()
 
+plt.hist(y_train.numpy(), bins=30)
+plt.xlabel('Target Value')
+plt.ylabel('Frequency')
+plt.title('Distribution of Target Values')
+plt.show()
+
 plt.scatter(y_test, y_pred, color='blue')
 plt.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], color='red', linewidth=2)
 plt.xlabel('True Values')
