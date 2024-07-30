@@ -46,7 +46,7 @@ optimizer = optim.SGD(model.parameters(), lr=0.01)
 
 
 print("now training")
-n_epochs = 1000
+n_epochs = 200000
 for epoch in range(n_epochs):
     model.train()
 
@@ -57,7 +57,7 @@ for epoch in range(n_epochs):
     loss.backward()
     optimizer.step()
 
-    if (epoch+1) % 100 == 0:
+    if (epoch+1) % 100000 == 0:
         print(f'Epoch [{epoch+1}/{n_epochs}], Loss: {loss.item():.4f}')
 
 model.eval()
@@ -66,21 +66,31 @@ with torch.no_grad():
     test_loss = criterion(y_pred, y_test)
     print(f'Test Loss: {test_loss.item():.4f}')
 
+    mean_absolute_error = torch.mean(torch.abs(y_pred - y_test)).item()
+    print(f'Mean absolute error: {mean_absolute_error:.4f}')
+    
+    ss_total = torch.sum((y_test - torch.mean(y_test)) ** 2)
+    ss_residual = torch.sum((y_test - y_pred) ** 2)
+    r_squared = 1 - ss_residual / ss_total
+    print(f'R-squared: {r_squared:.4f}')
+
 y_pred = y_pred.numpy()
 y_test = y_test.numpy()
 
-plt.hist(y_train.numpy(), bins=30)
-plt.xlabel('Target Value')
-plt.ylabel('Frequency')
-plt.title('Distribution of Target Values')
-plt.show()
+plt.scatter(y_test, y_pred, color='blue', label='Predictions')
+plt.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], color='red', linewidth=2, label="Identity line (Perfect prediction)")
+plt.text(0.0, 6, (f'n_epochs = {n_epochs}\nTest Loss = {test_loss:.4f}\nMean absolute error = {mean_absolute_error:.4f}\nR Squared = {r_squared:.4f}'), fontsize = 12)
 
-plt.scatter(y_test, y_pred, color='blue')
-plt.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], color='red', linewidth=2)
 plt.xlabel('True Values')
 plt.ylabel('Predictions')
-plt.title('True values vs Predictions')
+plt.legend()
 plt.show()
 
+plt.scatter(y_test, y_pred, color='blue', label='Predictions')
+plt.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], color='red', linewidth=2, label="Identity line (Perfect prediction)")
 
+plt.xlabel('True Values')
+plt.ylabel('Predictions')
+plt.legend()
+plt.show()
 
